@@ -13,23 +13,23 @@ const bloggSchema=new mongoose.Schema({
         type:objectId,
         ref:"firstAuthor"
     },
-    tags:[ Object],
+    tags:[ String],
     category:{
         type:String,
         required:true
     },
     subcategory:[Object],
     deletedAt:{
-        type:String,
-        default:""
+        type:Date
+    
     },
     isDeleted:{
         type:Boolean,
         default:false
     },
     publishedAt:{
-        type:String,
-        default:""
+        type:Date
+        
     },
     isPublished :{
         type:Boolean,
@@ -38,15 +38,3 @@ const bloggSchema=new mongoose.Schema({
 },{timestamps:true});
 
 module.exports=mongoose.model("blogg",bloggSchema);
-
-// { title: {mandatory},
-//  body: {mandatory
-//  authorId: {mandatory, refs to author model}, 
-//  tags: {array of string}, 
-//  category: {string, mandatory}, 
-//  subcategory: {array of string, examples[technology-[web development, mobile development, AI, ML etc]] }, 
-//  createdAt, updatedAt, 
-//  deletedAt: {when the document is deleted}, 
-//  isDeleted: {boolean, default: false}, 
-//  publishedAt: {when the blog is published}, 
-//  isPublished: {boolean, default: false}}
