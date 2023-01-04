@@ -18,17 +18,20 @@ const create=await blogModel.create(req.body)
     }
 
 };
+//======================================================
 const getBlogs = async function(req,res){
     try {
         let id = req.query.authorId
         let category = req.query.category
         let tags = req.query.tags
         let subcategory = req.query.subc
+
+        
         if(id||category||tags||subcategory){
             
             let author = await blogModel.find({$or:[{authorId:id},{category:category},{tags:{$in:[tags]}},{subcategory:{$in:[subcategory]}}],isDeleted:false});
 
-            if(author.length==0) return res.status(404).send({status:false, msg:"author not found"}) 
+            if(author.length==0) return res.status(404).send({status:false, msg:"data not found"}) 
 
             return res.status(200).send({status:true,msg:author});
 
@@ -42,7 +45,11 @@ const getBlogs = async function(req,res){
     return res.status(500).send({status:false, error:error.message})
 
 }};
+
+
+//======================================================
 const updateBlog = async function(req, res) {
+    console.log("this is me")
 
     try {
 
@@ -81,12 +88,18 @@ const updateBlog = async function(req, res) {
 }
 if(subcategory){
     let result=[]
-    if(typeof subcategory==="string")
-    {result.push(subcategory)}
     if(Array.isArray(subcategory))
     {
         result=[...subcategory]
     }
+   else if(typeof subcategory==="string")
+    {result.push(subcategory)}   
+    else
+    {
+       return res.status(404).send({result:"invalid data passed in subcategory"})
+    }
+     
+   
 let updatedSubcategory=[...b.subcategory,...result]
 final.subcategory=updatedSubcategory;
 }
@@ -99,13 +112,18 @@ let result = await blogModel.findOneAndUpdate({ _id: data }, final, { new: true 
         return res.status(500).send({ status: false, msg: error.message})
 }
 };
+
+//=============================================
+
 const deletById=async function(req,res){
     try{    
     let blogid=req.params.blogId;
     let id= await blogModel.findById(blogid);
-    if(!id) return res.status(404).send("Blogg not found")
+    if(!id) return res.status(404).send("Blogg not found");
+
     if(id.isDeleted==false){
-    let blogDeleted=await blogModel.findOneAndUpdate({_id:id},{isDeleted:true,deletedAt:Date.now()},{new:true})
+    let blogDeleted=await blogModel.findOneAndUpdate({_id:id},{isDeleted:true,deletedAt:Date.now()},{new:true});
+
     return res.status(200).send("blogg is deleted")
 }
      res.status(404).send("no such id")
@@ -113,7 +131,14 @@ const deletById=async function(req,res){
     res.status(500).send({satus:false,msg:error.message})
 
 }};
+
+//===================================================================
+
+
+
+
 const deleteQuery = async function(req, res) {
+    
     const { category, authorId, isPublished, tags, subCategory } = req.query
 
     if (!(category || authorId || isPublished || tags || subCategory)) {
@@ -125,13 +150,15 @@ const deleteQuery = async function(req, res) {
     if (blog.length == 0) {
         return res.status(404).send({ status: false, msg: "Blog document doesn't exists." })
     }
- 
+     
+    let token = req.headers["x-api-key"]
+    let decodedToken = jwt.verify(token, "californium-blog");
+    let authorLoggedIn = decodedToken.authorId
+    if (authorId != authorLoggedIn) return res.status(403).send({ status: false, msg: 'Access is Denied' })
+
     const update = await blogModel.updateMany({
         $or: [{ category: category },{ authorId: authorId },{ tags: { $in: [tags] } },
             { subCategory: { $in: [subCategory] } }]}, { isDeleted: true, deletedAt: Date.now(), new: true })
-
-    return res.status(200).send({ status: true, data:update})
+    return res.status(200).send({ status: true,data:update})
 }
-
-
 module.exports={createBlog,getBlogs,updateBlog,deletById,deleteQuery}
