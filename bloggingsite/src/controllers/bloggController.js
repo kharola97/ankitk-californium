@@ -78,6 +78,7 @@ const updateBlog = async function(req, res) {
 
         let final = { isPublished: true, publishedAt: Date.now()}
         const data = req.params.blogId
+        if(idcheck(data)) return res.status(400).send({ status: false, msg: "Enter valid authorId" })
         
         const { title, body, tags, subcategory } = req.body
         
