@@ -15,6 +15,7 @@ const createAuthor=async function(req,res){
    data.lname=lname;
 
     if(!validator.isAlpha(data.fname)||!validator.isAlpha(data.lname))  return res.status(400).send({status:false,msg:"invalid name"})
+     if(!(["Mr","Mrs","Miss"].includes(data.title)))  return res.status(400).send({status:false,msg:"please provide a valid title eg Mr,Mrs,Miss  "})
      
     
     
