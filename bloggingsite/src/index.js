@@ -1,13 +1,13 @@
 const express=require('express')
-const bodyParser=require('body-parser')
+
 const route=require('./route/route')
 const {default:mongoose}=require('mongoose')
 const app=express()
 
-app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({extended:true}));
+app.use(express.json())
 
-mongoose.connect("mongodb+srv://jassu_172:jassusharma123@cluster0.fhbdfgf.mongodb.net/test", {
+
+mongoose.connect("mongodb+srv://ankitdb:ankit321@cluster0.nz06g9j.mongodb.net/blogProject-DB?retryWrites=true&w=majority", {
     useNewUrlParser: true
 })
 .then( () => console.log("MongoDb is connected"))

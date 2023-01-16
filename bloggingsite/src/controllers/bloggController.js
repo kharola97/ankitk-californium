@@ -20,7 +20,7 @@ const createBlog=async (req,res)=>{
     
     if(idcheck(req.body.authorId)) return res.status(404).send({status:false,msg:"ID Incorrect"});
 
-    const authorID=await authorModel.findById(req.body.authorId);
+    const authorID=await authorModel.find({_id:req.body.authorId});
 
     if(!authorID) return res.status(404).send({status:false,msg:"invalid author id"});
 
@@ -78,19 +78,19 @@ const updateBlog = async function(req, res) {
 
         let final = { isPublished: true, publishedAt: Date.now()}
         const data = req.params.blogId
-        if(idcheck(data)) return res.status(400).send({ status: false, msg: "Enter valid authorId" }) //-----added new line added
+        if(idcheck(data)) return res.status(400).send({ status: false, message: "Enter valid authorId" }) //-----added new line added
         
         const { title, body, tags, subcategory } = req.body
         
         if (Object.keys(req.body).length === 0) {
-            return res.status(400).send({ status: false, msg: "Please enter details" })
+            return res.status(400).send({ status: false, message: "Please enter details" })
         }
 
         let blogData = await blogModel.findOne({ _id: data});
 
-        if(!blogData) return res.status(404).send({ status:false, msg:"Blog not found"})
+        if(!blogData) return res.status(404).send({ status:false, message:"Blog not found"})
 
-        if (blogData.isDeleted == true) return res.status(404).send({ status: false, msg: "Blog is deleted" })
+        if (blogData.isDeleted == true) return res.status(404).send({ status: false, message: "Blog is deleted" })
 
         if (title) {
             final.title = title
@@ -106,7 +106,7 @@ const updateBlog = async function(req, res) {
                 {
                     if(typeof tags[i]!=="string")
                     {
-                        return res.status(404).send({status:false,msg:"invalid data passed in tags"})
+                        return res.status(404).send({status:false,message:"invalid data passed in tags"})
                     }
                 }
               result=[...tags]}
@@ -114,7 +114,7 @@ const updateBlog = async function(req, res) {
 
              {result.push(tags)}
             else{
-               return res.status(400).send({status:false,msg:"Invalid data pass "})
+               return res.status(400).send({status:false,message:"Invalid data pass "})
            }
        let updatedTag=[...blogData.tags,...result]
          final.tags=updatedTag;
@@ -128,7 +128,7 @@ if(subcategory){
         {
             if(typeof subcategory[i]!=="string")
             {
-                return res.status(404).send({status:false,msg:"invalid data passed in subcategory"})
+                return res.status(404).send({status:false,message:"invalid data passed in subcategory"})
             }
         }
         console.log(subcategory)
@@ -139,7 +139,7 @@ if(subcategory){
     else
     {
         
-       return res.status(404).send({status:false,msg:"invalid data passed in subcategory"})
+       return res.status(404).send({status:false,message:"invalid data passed in subcategory"})
     }
 
    let updatedSubcategory=[...blogData.subcategory,...result]
@@ -158,19 +158,19 @@ if(subcategory){
 const deletById=async function(req,res){
     try{    
     let blogid=req.params.blogId;
-        if(idcheck(blogid)) return res.status(400).send({ status: false, msg: "Enter valid authorId" })//-----added new line added
+        if(idcheck(blogid)) return res.status(400).send({ status: false, message: "Enter valid authorId" })//-----added new line added
 
     let id= await blogModel.findById(blogid);
-    if(!id) return res.status(404).send({status:false,msg:"Blogg not found"})
+    if(!id) return res.status(404).send({status:false,message:"Blogg not found"})
 
-    if(id.isDeleted==true) return res.status(404).send({status:false,msg:"no such id"})
+    if(id.isDeleted==true) return res.status(404).send({status:false,message:"no such id"})
 
     let blogDeleted=await blogModel.findOneAndUpdate({_id:id},{isDeleted:true,deletedAt:Date.now()},{new:true})
     
     return res.status(200).send({status:false,data:"blogg is deleted"})
      
 } catch(error){
-    return res.status(500).send({satus:false,msg:error.message})
+    return res.status(500).send({satus:false,message:error.message})
 
 }};
 
@@ -181,23 +181,23 @@ const deleteQuery = async function(req, res) {
     try {const { category, authorId, isPublished, tags, subCategory } = req.query
 
     if (!(category || authorId || isPublished || tags || subCategory)) {
-        return res.status(400).send({ status: false, msg: "Kindly enter any value" })
+        return res.status(400).send({ status: false, message: "Kindly enter any value" })
     }
 
     if(authorId){
         
-    if(idcheck(authorId)) return res.status(400).send({ status: false, msg: "Enter valid authorId" })
+    if(idcheck(authorId)) return res.status(400).send({ status: false, message: "Enter valid authorId" })
 
     let blog = await blogModel.find({ authorId: authorId,isDeleted: false})
     if (blog.length == 0) {
-        return res.status(404).send({ status: false, msg: "Blog document doesn't exists." })
+        return res.status(404).send({ status: false, message: "Blog document doesn't exists." })
     }
     let authorLoggedIn = req.token
-    if (authorId != authorLoggedIn) return res.status(403).send({ status: false, msg: 'Access is Denied' })
+    if (authorId != authorLoggedIn) return res.status(403).send({ status: false, message: 'Access is Denied' })
 }
     let check=await blogModel.find({authorId:req.token,...req.query,isDeleted:false})
 
-    if(check.length==0) return res.status(404).send({status:false,msg:"no such blog"})
+    if(check.length==0) return res.status(404).send({status:false,message:"no such blog"})
     let a=req.query.category
 
     const update = await blogModel.updateMany({authorId:req.token,...req.query,isDeleted:false}, 
@@ -205,7 +205,7 @@ const deleteQuery = async function(req, res) {
     return res.status(200).send({ status: true, data:`${check.length} data deleted`})
 }
 catch(error){
-    return res.status(500).send({satus:false,msg:error.message})
+    return res.status(500).send({satus:false,message:error.message})
 }
 }
 

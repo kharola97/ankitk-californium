@@ -2,19 +2,19 @@ const express=require("express");
 const router=express.Router();
 const authorController=require("../controllers/authourController");
 const blogController=require('../controllers/bloggController')
-const middleWare=require("../middleware/middl")
+const middleWare=require("../middleware/middleware")
 
 router.post("/authors",authorController.createAuthor);
 //=========================================================
-router.post('/blogs',middleWare.authen, blogController.createBlog);
+router.post('/blogs', blogController.createBlog);
 //====================================================================
-router.get("/blogs",blogController.getBlogs);
+router.get("/blogs",middleWare.auth,blogController.getBlogs);
 //========================================================================
-router.put("/blogs/:blogId",middleWare.authen,middleWare.authoris,blogController.updateBlog);
+router.put("/blogs/:blogId",middleWare.auth,middleWare.authorisation,blogController.updateBlog);
 //====================================================================================================
-router.delete("/blogs/:blogId",middleWare.authen,middleWare.authoris,blogController.deletById);
+router.delete("/blogs/:blogId",middleWare.auth,middleWare.authorisation,blogController.deletById);
 //======================================================================================================
-router.delete("/blogs",middleWare.authen,middleWare.authoris,blogController.deleteQuery);
+router.delete("/blogs",middleWare.auth,middleWare.authorisation,blogController.deleteQuery);
 //==========================================================================================================
 
 router.post("/login",authorController.login);
